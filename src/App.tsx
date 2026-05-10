@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, Pause, RotateCcw, Trophy, ArrowRight, ArrowLeft, ArrowDown } from 'lucide-react';
+import { Play, Pause, RotateCcw, Trophy, ArrowRight, ArrowLeft, ArrowDown, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, RotateCw, Zap } from 'lucide-react';
 import { useTetris } from './hooks/useTetris';
 import Board from './components/Board';
 import PiecePreview from './components/PiecePreview';
@@ -74,7 +74,7 @@ export default function App() {
   }, [handleKeyDown]);
 
   return (
-    <div className="min-h-screen bg-[#1a0505] text-[#E4E4E7] flex flex-col font-sans selection:bg-red-500/30 overflow-x-hidden overflow-y-auto relative">
+    <div className="min-h-screen bg-[#1a0505] text-[#E4E4E7] flex flex-col font-sans selection:bg-red-500/30 overflow-x-hidden overflow-y-auto relative pb-20 lg:pb-0">
       {/* Background Ambient Glows */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-[10%] -left-[10%] w-[40%] h-[40%] bg-red-600/10 blur-[120px] rounded-full" />
@@ -107,8 +107,8 @@ export default function App() {
       <main className="flex-1 flex flex-col lg:flex-row p-6 md:p-12 space-y-8 lg:space-y-0 lg:space-x-12 items-center lg:items-start justify-center">
         
         {/* Left Sidebar: Controls & Hold */}
-        <div className="w-full max-w-64 space-y-6 shrink-0 order-2 lg:order-1">
-          <div className="p-6 bg-[#121214] border border-white/5 rounded-2xl">
+        <div className="w-full max-w-64 space-y-6 shrink-0 order-3 lg:order-1">
+          <div className="p-6 bg-[#121214] border border-white/5 rounded-2xl hidden lg:block">
             <h3 className="text-[10px] uppercase tracking-widest text-red-400 font-bold mb-4">Controller Guide</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -130,11 +130,19 @@ export default function App() {
             </div>
           </div>
           
-          <PiecePreview type={holdPiece} label="HOLD" />
+          <div className="flex lg:block items-center gap-4 lg:gap-0 lg:space-y-6">
+            <PiecePreview type={holdPiece} label="HOLD" />
+            <div className="lg:hidden flex-1">
+               <div className="p-4 bg-[#121214] border border-white/5 rounded-2xl text-center">
+                <p className="text-[10px] uppercase tracking-widest text-white/40 mb-1">Score</p>
+                <p className="text-xl font-mono font-bold text-red-500">{score.toLocaleString()}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Center: Game Board */}
-        <div className="relative order-1 lg:order-2 shrink-0">
+        <div className="relative order-1 lg:order-2 shrink-0 transform scale-90 sm:scale-100">
           <Board grid={grid} activePiece={activePiece} isClearing={lastClearedLines > 0} />
           
           {/* Combo Alert */}
@@ -214,10 +222,25 @@ export default function App() {
         </div>
 
         {/* Right Side: Next & Stats */}
-        <div className="w-full max-w-64 space-y-6 shrink-0 order-3">
-          <PiecePreview type={nextPiece} label="NEXT PIECE" />
+        <div className="w-full max-w-64 space-y-6 shrink-0 order-2 lg:order-3">
+          <div className="flex lg:block items-center gap-4 lg:gap-0 lg:space-y-6">
+            <PiecePreview type={nextPiece} label="NEXT" />
 
-          <div className="space-y-4">
+            <div className="lg:hidden flex-1">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-3 bg-[#121214] border border-white/5 rounded-xl text-center">
+                  <p className="text-[8px] uppercase tracking-widest text-white/40 mb-0.5">Lvl</p>
+                  <p className="text-sm font-bold">{level}</p>
+                </div>
+                <div className="p-3 bg-[#121214] border border-white/5 rounded-xl text-center">
+                  <p className="text-[8px] uppercase tracking-widest text-white/40 mb-0.5">Lines</p>
+                  <p className="text-sm font-bold text-red-500">{lines}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-4 hidden lg:block">
             <div className="p-6 bg-[#121214] border border-white/5 rounded-2xl relative overflow-hidden">
                <div className="absolute top-0 left-0 w-1 h-full bg-red-600"></div>
                <p className="text-[10px] uppercase tracking-widest text-white/40 font-bold mb-1">Current Score</p>
@@ -251,6 +274,60 @@ export default function App() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Controls Overlay */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-[#1a0505]/90 backdrop-blur-lg border-t border-white/10 z-50">
+        <div className="max-w-md mx-auto grid grid-cols-3 gap-4">
+          {/* Left Controls */}
+          <div className="grid grid-cols-2 gap-2">
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); move({ x: -1, y: 0 }); }}
+              className="h-16 bg-white/5 active:bg-white/20 rounded-2xl flex items-center justify-center p-4 touch-none"
+            >
+              <ChevronLeft className="w-8 h-8" />
+            </button>
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); move({ x: 1, y: 0 }); }}
+              className="h-16 bg-white/5 active:bg-white/20 rounded-2xl flex items-center justify-center p-4 touch-none"
+            >
+              <ChevronRight className="w-8 h-8" />
+            </button>
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); move({ x: 0, y: 1 }); }}
+              className="h-16 bg-white/5 active:bg-white/20 rounded-2xl flex items-center justify-center p-4 col-span-2 touch-none"
+            >
+              <ChevronDown className="w-8 h-8" />
+            </button>
+          </div>
+
+          {/* Action Center */}
+          <div className="flex flex-col gap-2">
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); hardDrop(); }}
+              className="h-full bg-red-600 active:bg-red-700 text-white rounded-2xl flex flex-col items-center justify-center p-2 shadow-lg shadow-red-600/20 touch-none"
+            >
+              <Zap className="w-6 h-6 mb-1" />
+              <span className="text-[10px] font-black uppercase tracking-tighter">DROP</span>
+            </button>
+          </div>
+
+          {/* Right Controls */}
+          <div className="grid grid-cols-2 gap-2">
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); attemptRotate(); }}
+              className="h-16 bg-white/5 active:bg-white/20 rounded-2xl flex items-center justify-center p-4 col-span-2 touch-none"
+            >
+              <RotateCw className="w-8 h-8" />
+            </button>
+            <button 
+              onPointerDown={(e) => { e.preventDefault(); hold(); }}
+              className="h-16 bg-white/5 active:bg-white/20 rounded-2xl flex items-center justify-center p-4 col-span-2 touch-none"
+            >
+              <span className="text-xs font-black uppercase">HOLD</span>
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Footer */}
       <footer className="h-12 bg-[#0a0000] border-t border-white/5 px-6 md:px-12 flex items-center justify-between text-[10px] uppercase tracking-[0.2em] text-white/30 font-bold shrink-0">
